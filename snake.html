@@ -2,142 +2,181 @@
 <html>
 <head>
   <title>Snake Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
   <style>
     body {
-      text-align: center;
-      background-color: #111;
+      margin: 0;
+      background: #111;
       color: white;
       font-family: Arial;
+      text-align: center;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h2 {
+      color: lime;
+      text-shadow: 0 0 10px lime;
     }
 
     canvas {
-      background-color: black;
-      margin-top: 20px;
-      border: 3px solid lime;
+      background: black;
+      border: 3px solid cyan;
+      margin: 10px;
     }
 
     .controls {
-      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 80px 80px 80px;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
     }
 
-    .btn {
-      font-size: 25px;
-      padding: 15px 20px;
-      margin: 5px;
-      border-radius: 10px;
+    button {
+      font-size: 24px;
+      padding: 15px;
+      border-radius: 12px;
       border: none;
-      background-color: lime;
+      background: cyan;
       color: black;
+      touch-action: manipulation;
+    }
+
+    button:active {
+      transform: scale(0.9);
     }
   </style>
 </head>
 
 <body>
 
-  <h1>🐍 Snake Game</h1>
-  <p>Use arrow keys or buttons</p>
+<h2>🐍 Snake</h2>
+<p>Score: <span id="score">0</span></p>
 
-  <canvas id="game" width="400" height="400"></canvas>
+<canvas id="game" width="300" height="300"></canvas>
 
-  <div class="controls">
-    <div>
-      <button class="btn" onclick="setDir('UP')">⬆️</button>
-    </div>
-    <div>
-      <button class="btn" onclick="setDir('LEFT')">⬅️</button>
-      <button class="btn" onclick="setDir('DOWN')">⬇️</button>
-      <button class="btn" onclick="setDir('RIGHT')">➡️</button>
-    </div>
-  </div>
+<div class="controls">
+  <div></div>
+  <button ontouchstart="setDir('up')" onclick="setDir('up')">⬆️</button>
+  <div></div>
 
-  <script>
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
+  <button ontouchstart="setDir('left')" onclick="setDir('left')">⬅️</button>
+  <div></div>
+  <button ontouchstart="setDir('right')" onclick="setDir('right')">➡️</button>
 
-    let box = 20;
-    let snake = [{x: 200, y: 200}];
-    let direction = "RIGHT";
+  <div></div>
+  <button ontouchstart="setDir('down')" onclick="setDir('down')">⬇️</button>
+  <div></div>
+</div>
 
-    let food = {
-      x: Math.floor(Math.random() * 20) * box,
-      y: Math.floor(Math.random() * 20) * box
-    };
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-    document.addEventListener("keydown", changeDirection);
+let snake, dir, food, score;
 
-    function changeDirection(event) {
-      if (event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
-      if (event.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
-      if (event.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
-      if (event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+/* START GAME */
+function startGame() {
+  snake = [{ x: 150, y: 150 }];
+  dir = "right";
+  food = spawnFood();
+  score = 0;
+}
+
+/* SPAWN FOOD */
+function spawnFood() {
+  return {
+    x: Math.floor(Math.random() * 15) * 20,
+    y: Math.floor(Math.random() * 15) * 20
+  };
+}
+
+/* CHANGE DIRECTION */
+function setDir(newDir) {
+  if (newDir === "up" && dir !== "down") dir = "up";
+  if (newDir === "down" && dir !== "up") dir = "down";
+  if (newDir === "left" && dir !== "right") dir = "left";
+  if (newDir === "right" && dir !== "left") dir = "right";
+}
+
+/* KEYBOARD */
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowUp") setDir("up");
+  if (e.key === "ArrowDown") setDir("down");
+  if (e.key === "ArrowLeft") setDir("left");
+  if (e.key === "ArrowRight") setDir("right");
+});
+
+/* UPDATE */
+function update() {
+  let head = { ...snake[0] };
+
+  if (dir === "up") head.y -= 20;
+  if (dir === "down") head.y += 20;
+  if (dir === "left") head.x -= 20;
+  if (dir === "right") head.x += 20;
+
+  // wall collision
+  if (head.x < 0 || head.y < 0 || head.x >= 300 || head.y >= 300) {
+    gameOver();
+    return;
+  }
+
+  // self collision
+  for (let part of snake) {
+    if (head.x === part.x && head.y === part.y) {
+      gameOver();
+      return;
     }
+  }
 
-    function setDir(dir) {
-      if (dir === "UP" && direction !== "DOWN") direction = "UP";
-      if (dir === "DOWN" && direction !== "UP") direction = "DOWN";
-      if (dir === "LEFT" && direction !== "RIGHT") direction = "LEFT";
-      if (dir === "RIGHT" && direction !== "LEFT") direction = "RIGHT";
-    }
+  snake.unshift(head);
 
-    function draw() {
-      ctx.fillStyle = "black";
-      ctx.fillRect(0, 0, 400, 400);
+  // eat food
+  if (head.x === food.x && head.y === food.y) {
+    score++;
+    food = spawnFood();
+  } else {
+    snake.pop();
+  }
 
-      // snake
-      for (let i = 0; i < snake.length; i++) {
-        ctx.fillStyle = i === 0 ? "lime" : "green";
-        ctx.fillRect(snake[i].x, snake[i].y, box, box);
-      }
+  draw();
+}
 
-      // food
-      ctx.fillStyle = "red";
-      ctx.fillRect(food.x, food.y, box, box);
+/* DRAW */
+function draw() {
+  ctx.clearRect(0, 0, 300, 300);
 
-      let headX = snake[0].x;
-      let headY = snake[0].y;
+  // snake
+  ctx.fillStyle = "lime";
+  snake.forEach(p => ctx.fillRect(p.x, p.y, 20, 20));
 
-      if (direction === "UP") headY -= box;
-      if (direction === "DOWN") headY += box;
-      if (direction === "LEFT") headX -= box;
-      if (direction === "RIGHT") headX += box;
+  // food
+  ctx.fillStyle = "red";
+  ctx.fillRect(food.x, food.y, 20, 20);
 
-      // eat food
-      if (headX === food.x && headY === food.y) {
-        food = {
-          x: Math.floor(Math.random() * 20) * box,
-          y: Math.floor(Math.random() * 20) * box
-        };
-      } else {
-        snake.pop();
-      }
+  document.getElementById("score").innerText = score;
+}
 
-      let newHead = {x: headX, y: headY};
+/* GAME OVER */
+function gameOver() {
+  alert("💥 Game Over! Score: " + score);
+  startGame();
+}
 
-      // game over
-      if (
-        headX < 0 || headY < 0 ||
-        headX >= 400 || headY >= 400 ||
-        collision(newHead, snake)
-      ) {
-        clearInterval(game);
-        alert("Game Over!");
-      }
+/* START */
+startGame();
 
-      snake.unshift(newHead);
-    }
-
-    function collision(head, array) {
-      for (let i = 0; i < array.length; i++) {
-        if (head.x === array[i].x && head.y === array[i].y) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    let game = setInterval(draw, 120);
-  </script>
+/* 🔥 SLOWER SPEED (THIS FIXES YOUR ISSUE) */
+setInterval(update, 150); // was faster before
+</script>
 
 </body>
 </html>
+      
