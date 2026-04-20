@@ -2,26 +2,74 @@
 <html>
 <head>
   <title>Nori's Game Hub</title>
+
+  <!-- THIS fixes mobile scaling -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       background-color: #111;
       color: white;
       font-family: Arial;
       text-align: center;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 8vw; /* scales with screen */
+      margin-top: 20px;
+    }
+
+    p {
+      font-size: 4vw;
     }
 
     .game {
       background: #222;
       padding: 20px;
-      margin: 15px;
-      border-radius: 10px;
-      display: inline-block;
-      width: 200px;
+      margin: 20px auto;
+      border-radius: 15px;
+      width: 80%;
+      max-width: 400px;
+    }
+
+    .game h3 {
+      font-size: 6vw;
     }
 
     a {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 5vw;
       color: cyan;
       text-decoration: none;
+      padding: 10px 20px;
+      border: 2px solid cyan;
+      border-radius: 10px;
+    }
+
+    a:active {
+      background-color: cyan;
+      color: black;
+    }
+
+    /* Desktop adjustments */
+    @media (min-width: 768px) {
+      h1 {
+        font-size: 50px;
+      }
+
+      p {
+        font-size: 20px;
+      }
+
+      .game h3 {
+        font-size: 24px;
+      }
+
+      a {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
@@ -31,12 +79,12 @@
   <p>Play some cool games!</p>
 
   <div class="game">
-    <h3>Snake Game</h3>
+    <h3>🐍 Snake Game</h3>
     <a href="snake.html">Play</a>
   </div>
 
   <div class="game">
-    <h3>Clicker Game</h3>
+    <h3>🔥 Clicker Game</h3>
     <a href="clicker.html">Play</a>
   </div>
 
