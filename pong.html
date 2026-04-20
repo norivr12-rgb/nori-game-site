@@ -12,29 +12,27 @@
       font-family: Arial;
       text-align: center;
       overflow: hidden;
-      touch-action: none;
+      touch-action: manipulation;
     }
 
     h1 {
       color: cyan;
-      text-shadow: 0 0 10px cyan;
     }
 
     canvas {
       display: none;
+      margin: auto;
       border: 2px solid cyan;
+      background: #000;
     }
 
     .menu {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      margin-top: 100px;
     }
 
     button {
-      font-size: 24px;
-      padding: 15px 30px;
+      font-size: 20px;
+      padding: 12px 20px;
       margin: 10px;
       border: none;
       border-radius: 10px;
@@ -42,21 +40,30 @@
       color: black;
     }
 
-    button:active {
-      transform: scale(0.9);
-    }
-
-    .overlay {
-      position: fixed;
-      width: 100%;
-      height: 100%;
+    /* MOBILE BUTTONS */
+    .controls {
       display: none;
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
     }
 
     .side {
-      width: 50%;
-      height: 100%;
-      float: left;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn {
+      width: 60px;
+      height: 60px;
+      font-size: 20px;
+      border-radius: 12px;
+      background: lime;
+      border: none;
     }
   </style>
 </head>
@@ -72,9 +79,18 @@
 
 <canvas id="game"></canvas>
 
-<div class="overlay" id="touch">
-  <div class="side" id="left"></div>
-  <div class="side" id="right"></div>
+<div class="controls" id="controls">
+  <!-- PLAYER 1 -->
+  <div class="side">
+    <button class="btn" ontouchstart="p1Up=true" ontouchend="p1Up=false">⬆️</button>
+    <button class="btn" ontouchstart="p1Down=true" ontouchend="p1Down=false">⬇️</button>
+  </div>
+
+  <!-- PLAYER 2 -->
+  <div class="side">
+    <button class="btn" ontouchstart="p2Up=true" ontouchend="p2Up=false">⬆️</button>
+    <button class="btn" ontouchstart="p2Down=true" ontouchend="p2Down=false">⬇️</button>
+  </div>
 </div>
 
 <script>
@@ -83,23 +99,26 @@ const ctx = canvas.getContext("2d");
 
 let mode = 1;
 
-/* RESIZE */
+/* SMALLER CANVAS (BETTER VISIBILITY) */
 function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth * 0.9;
+  canvas.height = window.innerHeight * 0.6;
 }
 window.addEventListener("resize", resize);
 
 /* GAME STATE */
 let player1Y, player2Y, ball;
 
-/* START GAME */
+let p1Up = false, p1Down = false;
+let p2Up = false, p2Down = false;
+
+/* START */
 function startGame(m) {
   mode = m;
 
   document.getElementById("menu").style.display = "none";
+  document.getElementById("controls").style.display = "flex";
   canvas.style.display = "block";
-  document.getElementById("touch").style.display = "block";
 
   resize();
 
@@ -110,46 +129,25 @@ function startGame(m) {
     x: canvas.width / 2,
     y: canvas.height / 2,
     vx: 5,
-    vy: 3,
-    size: 10
+    vy: 3
   };
 }
-
-/* TOUCH */
-let p1Up = false, p1Down = false;
-let p2Up = false, p2Down = false;
-
-document.getElementById("left").addEventListener("touchstart", e => {
-  e.preventDefault();
-  p1Up = true;
-});
-document.getElementById("left").addEventListener("touchend", () => p1Up = false);
-
-document.getElementById("right").addEventListener("touchstart", e => {
-  e.preventDefault();
-  p1Down = true;
-});
-document.getElementById("right").addEventListener("touchend", () => p1Down = false);
 
 /* KEYBOARD */
 document.addEventListener("keydown", e => {
   if (e.key === "w") p1Up = true;
   if (e.key === "s") p1Down = true;
 
-  if (mode === 2) {
-    if (e.key === "ArrowUp") p2Up = true;
-    if (e.key === "ArrowDown") p2Down = true;
-  }
+  if (e.key === "ArrowUp") p2Up = true;
+  if (e.key === "ArrowDown") p2Down = true;
 });
 
 document.addEventListener("keyup", e => {
   if (e.key === "w") p1Up = false;
   if (e.key === "s") p1Down = false;
 
-  if (mode === 2) {
-    if (e.key === "ArrowUp") p2Up = false;
-    if (e.key === "ArrowDown") p2Down = false;
-  }
+  if (e.key === "ArrowUp") p2Up = false;
+  if (e.key === "ArrowDown") p2Down = false;
 });
 
 /* UPDATE */
@@ -158,42 +156,34 @@ function update() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // player 1
+  // PLAYER 1
   if (p1Up) player1Y -= 6;
   if (p1Down) player1Y += 6;
 
-  // player 2
+  // PLAYER 2 or AI
   if (mode === 1) {
-    // AI
     player2Y += (ball.y - (player2Y + 50)) * 0.1;
   } else {
     if (p2Up) player2Y -= 6;
     if (p2Down) player2Y += 6;
   }
 
-  // ball
+  // clamp
+  player1Y = Math.max(0, Math.min(canvas.height - 100, player1Y));
+  player2Y = Math.max(0, Math.min(canvas.height - 100, player2Y));
+
+  // BALL
   ball.x += ball.vx;
   ball.y += ball.vy;
 
-  if (ball.y <= 0 || ball.y >= canvas.height) {
-    ball.vy *= -1;
-  }
+  if (ball.y <= 0 || ball.y >= canvas.height) ball.vy *= -1;
 
-  // collision P1
-  if (
-    ball.x <= 20 &&
-    ball.y > player1Y &&
-    ball.y < player1Y + 100
-  ) {
+  // collisions
+  if (ball.x <= 20 && ball.y > player1Y && ball.y < player1Y + 100) {
     ball.vx *= -1;
   }
 
-  // collision P2
-  if (
-    ball.x >= canvas.width - 20 &&
-    ball.y > player2Y &&
-    ball.y < player2Y + 100
-  ) {
+  if (ball.x >= canvas.width - 20 && ball.y > player2Y && ball.y < player2Y + 100) {
     ball.vx *= -1;
   }
 
@@ -203,14 +193,13 @@ function update() {
     ball.y = canvas.height / 2;
   }
 
-  // draw paddles
+  // DRAW
   ctx.fillStyle = "lime";
   ctx.fillRect(10, player1Y, 10, 100);
 
   ctx.fillStyle = "red";
   ctx.fillRect(canvas.width - 20, player2Y, 10, 100);
 
-  // ball
   ctx.fillStyle = "white";
   ctx.fillRect(ball.x, ball.y, 10, 10);
 }
