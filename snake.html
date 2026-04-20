@@ -83,18 +83,27 @@ let snake, dir, food, score;
 
 /* START GAME */
 function startGame() {
-  snake = [{ x: 150, y: 150 }];
+  snake = [{ x: 140, y: 140 }];
   dir = "right";
   food = spawnFood();
   score = 0;
 }
 
-/* SPAWN FOOD */
+/* SPAWN FOOD (FIXED) */
 function spawnFood() {
-  return {
-    x: Math.floor(Math.random() * 15) * 20,
-    y: Math.floor(Math.random() * 15) * 20
-  };
+  let newFood;
+
+  while (true) {
+    newFood = {
+      x: Math.floor(Math.random() * 15) * 20,
+      y: Math.floor(Math.random() * 15) * 20
+    };
+
+    let onSnake = snake.some(p => p.x === newFood.x && p.y === newFood.y);
+    if (!onSnake) break;
+  }
+
+  return newFood;
 }
 
 /* CHANGE DIRECTION */
@@ -138,9 +147,14 @@ function update() {
 
   snake.unshift(head);
 
-  // eat food
+  /* 🍎 EAT FOOD (FIXED) */
   if (head.x === food.x && head.y === food.y) {
     score++;
+
+    // quick visual flash
+    canvas.style.background = "#033";
+    setTimeout(() => canvas.style.background = "black", 50);
+
     food = spawnFood();
   } else {
     snake.pop();
@@ -173,10 +187,9 @@ function gameOver() {
 /* START */
 startGame();
 
-/* 🔥 SLOWER SPEED (THIS FIXES YOUR ISSUE) */
-setInterval(update, 150); // was faster before
+/* 🐢 SLOW SPEED */
+setInterval(update, 150);
 </script>
 
 </body>
 </html>
-      
