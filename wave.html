@@ -1,1 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Wave Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: white;
+      text-align: center;
+      font-family: Arial;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      margin: auto;
+      background: #000;
+      border: 2px solid cyan;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>⚡ Wave Game</h2>
+<p>Hold to go up | Release to go down</p>
+<p>Score: <span id="score">0</span></p>
+
+<canvas id="game" width="400" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let player = { x: 80, y: 200, size: 10 };
+let velocity = 0;
+let holding = false;
+
+let obstacles = [];
+let score = 0;
+
+// controls
+document.addEventListener("keydown", e => {
+  if (e.key === " ") holding = true;
+});
+
+document.addEventListener("keyup", e => {
+  if (e.key === " ") holding = false;
+});
+
+canvas.addEventListener("touchstart", () => holding = true);
+canvas.addEventListener("touchend", () => holding = false);
+
+// spawn obstacles
+function spawnObstacle() {
+  let gap = 120;
+  let topHeight = Math.random() * 200;
+
+  obstacles.push({
+    x: 400,
+    top: topHeight,
+    bottom: topHeight + gap,
+    width: 40
+  });
+}
+
+// game loop
+function update() {
+  ctx.clearRect(0, 0, 400, 400);
+
+  // wave movement
+  if (holding) {
+    velocity = -4;
+  } else {
+    velocity = 4;
+  }
+
+  player.y += velocity;
+
+  // draw player
+  ctx.fillStyle = "lime";
+  ctx.beginPath();
+  ctx.moveTo(player.x, player.y);
+  ctx.lineTo(player.x + player.size, player.y + player.size);
+  ctx.lineTo(player.x, player.y + player.size * 2);
+  ctx.closePath();
+  ctx.fill();
+
+  // obstacles
+  ctx.fillStyle = "red";
+  obstacles.forEach(o => {
+    o.x -= 4;
+
+    // top block
+    ctx.fillRect(o.x, 0, o.width, o.top);
+
+    // bottom block
+    ctx.fillRect(o.x, o.bottom, o.width, 400);
+
+    // collision
+    if (
+      player.x < o.x + o.width &&
+      player.x + player.size > o.x &&
+      (player.y < o.top || player.y + player.size * 2 > o.bottom)
+    ) {
+      alert("💥 Game Over! Score: " + score);
+      location.reload();
+    }
+  });
+
+  obstacles = obstacles.filter(o => o.x > -50);
+
+  // bounds
+  if (player.y < 0 || player.y > 400) {
+    alert("💥 Game Over! Score: " + score);
+    location.reload();
+  }
+
+  score++;
+  document.getElementById("score").innerText = score;
+}
+
+setInterval(update, 1000/60);
+setInterval(spawnObstacle, 1200);
+</script>
+
+</body>
+</html>
