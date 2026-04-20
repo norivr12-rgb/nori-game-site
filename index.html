@@ -3,7 +3,6 @@
 <head>
   <title>Nori's Game Hub</title>
 
-  <!-- THIS fixes mobile scaling -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -16,7 +15,7 @@
     }
 
     h1 {
-      font-size: 8vw; /* scales with screen */
+      font-size: 8vw;
       margin-top: 20px;
     }
 
@@ -24,13 +23,20 @@
       font-size: 4vw;
     }
 
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+
     .game {
       background: #222;
       padding: 20px;
-      margin: 20px auto;
       border-radius: 15px;
       width: 80%;
-      max-width: 400px;
+      max-width: 300px;
     }
 
     .game h3 {
@@ -53,7 +59,7 @@
       color: black;
     }
 
-    /* Desktop adjustments */
+    /* Desktop layout */
     @media (min-width: 768px) {
       h1 {
         font-size: 50px;
@@ -64,28 +70,42 @@
       }
 
       .game h3 {
-        font-size: 24px;
+        font-size: 22px;
       }
 
       a {
-        font-size: 18px;
+        font-size: 16px;
+      }
+
+      .game {
+        width: 250px;
       }
     }
   </style>
 </head>
 
 <body>
+
   <h1>🎮 Nori's Game Hub</h1>
   <p>Play some cool games!</p>
 
-  <div class="game">
-    <h3>🐍 Snake Game</h3>
-    <a href="snake.html">Play</a>
-  </div>
+  <div class="container">
 
-  <div class="game">
-    <h3>🔥 Clicker Game</h3>
-    <a href="clicker.html">Play</a>
+    <div class="game">
+      <h3>🔥 Clicker Game</h3>
+      <a href="clicker.html">Play</a>
+    </div>
+
+    <div class="game">
+      <h3>🐍 Snake Game</h3>
+      <a href="snake.html">Play</a>
+    </div>
+
+    <div class="game">
+      <h3>🏓 Pong (2 Player)</h3>
+      <a href="pong.html">Play</a>
+    </div>
+
   </div>
 
 </body>
