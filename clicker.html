@@ -2,13 +2,11 @@
 <html>
 <head>
   <title>Clicker Game</title>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
   <style>
     html, body {
       margin: 0;
-      padding: 0;
       font-family: Arial;
       background: #111;
       color: white;
@@ -17,15 +15,15 @@
     }
 
     h1 {
-      margin-top: 20px;
       color: cyan;
       text-shadow: 0 0 10px cyan;
+      margin-top: 20px;
     }
 
     #score {
       font-size: 60px;
-      margin: 10px;
       color: lime;
+      margin: 10px;
     }
 
     #clickBtn {
@@ -37,7 +35,6 @@
       color: black;
       margin: 20px auto;
       display: block;
-      -webkit-tap-highlight-color: transparent;
     }
 
     #clickBtn:active {
@@ -86,6 +83,11 @@
     <p>🤖 Auto Clicker (Cost: <span id="costAuto">25</span>)</p>
     <button onclick="buyAuto()">BUY</button>
   </div>
+
+  <div class="item">
+    <p>⚡ Faster Auto (Cost: <span id="costSpeed">50</span>)</p>
+    <button onclick="buySpeed()">BUY</button>
+  </div>
 </div>
 
 <script>
@@ -96,6 +98,10 @@ let autoClickers = 0;
 
 let costPower = 10;
 let costAuto = 25;
+let costSpeed = 50;
+
+let autoInterval = 1000;
+let autoLoop;
 
 /* 💾 LOAD */
 function loadGame() {
@@ -109,6 +115,8 @@ function loadGame() {
     autoClickers = data.autoClickers ?? 0;
     costPower = data.costPower ?? 10;
     costAuto = data.costAuto ?? 25;
+    costSpeed = data.costSpeed ?? 50;
+    autoInterval = data.autoInterval ?? 1000;
   }
 
   update();
@@ -121,7 +129,9 @@ function saveGame() {
     clickPower,
     autoClickers,
     costPower,
-    costAuto
+    costAuto,
+    costSpeed,
+    autoInterval
   }));
 }
 
@@ -132,44 +142,69 @@ function clicker() {
   saveGame();
 }
 
-/* ⚡ POWER */
+/* ⚡ CLICK POWER */
 function buyPower() {
   if (score >= costPower) {
     score -= costPower;
-    clickPower += 1;
+    clickPower++;
     costPower = Math.floor(costPower * 1.5);
     update();
     saveGame();
   }
 }
 
-/* 🤖 AUTO */
+/* 🤖 AUTO CLICKER */
 function buyAuto() {
   if (score >= costAuto) {
     score -= costAuto;
-    autoClickers += 1;
+    autoClickers++;
     costAuto = Math.floor(costAuto * 1.7);
     update();
     saveGame();
   }
 }
 
-/* 🔁 AUTO EARN */
-setInterval(() => {
-  score += autoClickers;
-  update();
-  saveGame();
-}, 1000);
+/* ⚡ SPEED UPGRADE */
+function buySpeed() {
+  if (score >= costSpeed) {
+    score -= costSpeed;
+
+    costSpeed = Math.floor(costSpeed * 2);
+
+    autoInterval *= 0.85; // faster each time
+
+    restartAuto();
+
+    update();
+    saveGame();
+  }
+}
+
+/* 🔁 AUTO SYSTEM */
+function startAuto() {
+  autoLoop = setInterval(() => {
+    score += autoClickers;
+    update();
+    saveGame();
+  }, autoInterval);
+}
+
+function restartAuto() {
+  clearInterval(autoLoop);
+  startAuto();
+}
 
 /* 🔄 UPDATE UI */
 function update() {
   document.getElementById("score").innerText = score;
   document.getElementById("costPower").innerText = costPower;
   document.getElementById("costAuto").innerText = costAuto;
+  document.getElementById("costSpeed").innerText = costSpeed;
 }
 
 /* 🚀 START */
 loadGame();
+startAuto();
 
 </script>
 
