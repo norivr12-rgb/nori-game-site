@@ -1,88 +1,173 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>2 Player Pong</title>
+  <title>Pong</title>
+
+  <!-- 📱 LOCK MOBILE BEHAVIOR -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
   <style>
-    body {
-      text-align: center;
-      background: #111;
+    html, body {
+      margin: 0;
+      background: black;
       color: white;
       font-family: Arial;
+      overflow: hidden;
+      touch-action: none;
+      -webkit-user-select: none;
+    }
+
+    h2 {
+      text-align: center;
+      color: cyan;
     }
 
     canvas {
-      background: black;
-      margin-top: 20px;
-      border: 3px solid white;
+      display: block;
+      margin: auto;
+      border: 2px solid cyan;
+      background: #000;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+
+      display: flex;
+    }
+
+    .side {
+      flex: 1;
     }
   </style>
 </head>
 
 <body>
 
-<h1>🏓 2 Player Pong</h1>
-<p>Player 1: W/S | Player 2: ↑/↓</p>
+<h2>🏓 Pong (Tap Left / Right)</h2>
 
-<canvas id="game" width="600" height="400"></canvas>
+<canvas id="game"></canvas>
+
+<div class="overlay">
+  <div class="side" id="left"></div>
+  <div class="side" id="right"></div>
+</div>
 
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-let paddleHeight = 80;
-let p1Y = 160;
-let p2Y = 160;
+/* 📱 AUTO SIZE FOR LANDSCAPE */
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight - 50;
+}
+resize();
+window.addEventListener("resize", resize);
 
-let ballX = 300;
-let ballY = 200;
-let ballSpeedX = 4;
-let ballSpeedY = 4;
+/* GAME STATE */
+let paddleHeight = 100;
+let playerY = 100;
+let aiY = 100;
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "w") p1Y -= 20;
-  if (e.key === "s") p1Y += 20;
-  if (e.key === "ArrowUp") p2Y -= 20;
-  if (e.key === "ArrowDown") p2Y += 20;
+let ball = {
+  x: 200,
+  y: 200,
+  vx: 5,
+  vy: 3,
+  size: 10
+};
+
+/* TOUCH CONTROLS */
+let moveUp = false;
+let moveDown = false;
+
+document.getElementById("left").addEventListener("touchstart", e => {
+  e.preventDefault();
+  moveUp = true;
+});
+document.getElementById("left").addEventListener("touchend", () => moveUp = false);
+
+document.getElementById("right").addEventListener("touchstart", e => {
+  e.preventDefault();
+  moveDown = true;
+});
+document.getElementById("right").addEventListener("touchend", () => moveDown = false);
+
+/* KEYBOARD */
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowUp") moveUp = true;
+  if (e.key === "ArrowDown") moveDown = true;
+});
+document.addEventListener("keyup", e => {
+  if (e.key === "ArrowUp") moveUp = false;
+  if (e.key === "ArrowDown") moveDown = false;
 });
 
-function draw() {
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, 600, 400);
+/* UPDATE */
+function update() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // paddles
+  // move player
+  if (moveUp) playerY -= 6;
+  if (moveDown) playerY += 6;
+
+  // clamp
+  playerY = Math.max(0, Math.min(canvas.height - paddleHeight, playerY));
+
+  // AI follows ball
+  aiY += (ball.y - (aiY + paddleHeight / 2)) * 0.1;
+
+  // move ball
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+
+  // wall bounce
+  if (ball.y <= 0 || ball.y >= canvas.height) {
+    ball.vy *= -1;
+  }
+
+  // player hit
+  if (
+    ball.x <= 20 &&
+    ball.y > playerY &&
+    ball.y < playerY + paddleHeight
+  ) {
+    ball.vx *= -1;
+  }
+
+  // AI hit
+  if (
+    ball.x >= canvas.width - 20 &&
+    ball.y > aiY &&
+    ball.y < aiY + paddleHeight
+  ) {
+    ball.vx *= -1;
+  }
+
+  // reset
+  if (ball.x < 0 || ball.x > canvas.width) {
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height / 2;
+  }
+
+  // draw paddles
+  ctx.fillStyle = "lime";
+  ctx.fillRect(10, playerY, 10, paddleHeight);
+
+  ctx.fillStyle = "red";
+  ctx.fillRect(canvas.width - 20, aiY, 10, paddleHeight);
+
+  // draw ball
   ctx.fillStyle = "white";
-  ctx.fillRect(10, p1Y, 10, paddleHeight);
-  ctx.fillRect(580, p2Y, 10, paddleHeight);
-
-  // ball
-  ctx.beginPath();
-  ctx.arc(ballX, ballY, 10, 0, Math.PI * 2);
-  ctx.fill();
-
-  ballX += ballSpeedX;
-  ballY += ballSpeedY;
-
-  // bounce top/bottom
-  if (ballY < 0 || ballY > 400) ballSpeedY *= -1;
-
-  // paddle collision
-  if (ballX < 20 && ballY > p1Y && ballY < p1Y + paddleHeight) {
-    ballSpeedX *= -1;
-  }
-
-  if (ballX > 580 && ballY > p2Y && ballY < p2Y + paddleHeight) {
-    ballSpeedX *= -1;
-  }
-
-  // reset if score
-  if (ballX < 0 || ballX > 600) {
-    ballX = 300;
-    ballY = 200;
-  }
+  ctx.fillRect(ball.x, ball.y, ball.size, ball.size);
 }
 
-setInterval(draw, 1000/60);
+/* LOOP */
+setInterval(update, 1000/60);
 </script>
 
 </body>
