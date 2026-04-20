@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>2 Player Pong</title>
+
+  <style>
+    body {
+      text-align: center;
+      background: #111;
+      color: white;
+      font-family: Arial;
+    }
+
+    canvas {
+      background: black;
+      margin-top: 20px;
+      border: 3px solid white;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🏓 2 Player Pong</h1>
+<p>Player 1: W/S | Player 2: ↑/↓</p>
+
+<canvas id="game" width="600" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let paddleHeight = 80;
+let p1Y = 160;
+let p2Y = 160;
+
+let ballX = 300;
+let ballY = 200;
+let ballSpeedX = 4;
+let ballSpeedY = 4;
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "w") p1Y -= 20;
+  if (e.key === "s") p1Y += 20;
+  if (e.key === "ArrowUp") p2Y -= 20;
+  if (e.key === "ArrowDown") p2Y += 20;
+});
+
+function draw() {
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, 600, 400);
+
+  // paddles
+  ctx.fillStyle = "white";
+  ctx.fillRect(10, p1Y, 10, paddleHeight);
+  ctx.fillRect(580, p2Y, 10, paddleHeight);
+
+  // ball
+  ctx.beginPath();
+  ctx.arc(ballX, ballY, 10, 0, Math.PI * 2);
+  ctx.fill();
+
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
+
+  // bounce top/bottom
+  if (ballY < 0 || ballY > 400) ballSpeedY *= -1;
+
+  // paddle collision
+  if (ballX < 20 && ballY > p1Y && ballY < p1Y + paddleHeight) {
+    ballSpeedX *= -1;
+  }
+
+  if (ballX > 580 && ballY > p2Y && ballY < p2Y + paddleHeight) {
+    ballSpeedX *= -1;
+  }
+
+  // reset if score
+  if (ballX < 0 || ballX > 600) {
+    ballX = 300;
+    ballY = 200;
+  }
+}
+
+setInterval(draw, 1000/60);
+</script>
+
+</body>
+</html>
