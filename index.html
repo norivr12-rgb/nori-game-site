@@ -1,129 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Nori's Arcade</title>
-
+  <title>Nori Arcade Hub</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
       margin: 0;
       font-family: Arial;
-      background: radial-gradient(circle, #000 40%, #020024 100%);
+      background: radial-gradient(circle, #000 40%, #020024);
       color: white;
       text-align: center;
     }
 
     h1 {
-      font-size: 9vw;
+      font-size: 10vw;
       color: cyan;
-      text-shadow: 0 0 20px cyan, 0 0 40px cyan;
+      text-shadow: 0 0 20px cyan;
       margin-top: 20px;
     }
 
     p {
-      font-size: 4vw;
       color: #aaa;
+      font-size: 4vw;
     }
 
-    .container {
+    .grid {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 25px;
+      gap: 20px;
       padding: 20px;
     }
 
-    .game {
+    .card {
       background: #111;
       border: 2px solid cyan;
-      border-radius: 15px;
-      padding: 20px;
-      width: 80%;
-      max-width: 300px;
       box-shadow: 0 0 15px cyan;
-      transition: 0.3s;
+      padding: 20px;
+      border-radius: 15px;
+      width: 80%;
+      max-width: 250px;
+      transition: 0.2s;
     }
 
-    .game:hover {
+    .card:hover {
       transform: scale(1.05);
       box-shadow: 0 0 30px cyan;
     }
 
-    .game h3 {
-      font-size: 6vw;
+    h2 {
       color: lime;
       text-shadow: 0 0 10px lime;
     }
 
     a {
       display: inline-block;
-      margin-top: 15px;
-      font-size: 5vw;
-      padding: 12px 25px;
-      border-radius: 10px;
-      border: none;
+      margin-top: 10px;
+      padding: 10px 20px;
       background: black;
+      border: 2px solid cyan;
       color: cyan;
       text-decoration: none;
-      box-shadow: 0 0 10px cyan;
-      transition: 0.2s;
-    }
-
-    a:hover {
-      background: cyan;
-      color: black;
-      box-shadow: 0 0 20px cyan;
+      border-radius: 10px;
     }
 
     a:active {
-      transform: scale(0.95);
-    }
-
-    /* Desktop tweaks */
-    @media (min-width: 768px) {
-      h1 {
-        font-size: 60px;
-      }
-
-      p {
-        font-size: 20px;
-      }
-
-      .game h3 {
-        font-size: 24px;
-      }
-
-      a {
-        font-size: 16px;
-      }
+      background: cyan;
+      color: black;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>🎮 Nori's Arcade</h1>
-  <p>Select a game and play!</p>
+<h1>🎮 ARCADE HUB</h1>
+<p>Select your game</p>
 
-  <div class="container">
+<div class="grid">
 
-    <div class="game">
-      <h3>🔥 Clicker</h3>
-      <a href="clicker.html">PLAY</a>
-    </div>
-
-    <div class="game">
-      <h3>🐍 Snake</h3>
-      <a href="snake.html">PLAY</a>
-    </div>
-
-    <div class="game">
-      <h3>🏓 Pong</h3>
-      <a href="pong.html">PLAY</a>
-    </div>
-
+  <div class="card">
+    <h2>🔥 Clicker</h2>
+    <a href="clicker.html">PLAY</a>
   </div>
+
+  <div class="card">
+    <h2>🐍 Snake</h2>
+    <a href="snake.html">PLAY</a>
+  </div>
+
+  <div class="card">
+    <h2>👾 Space Shooter</h2>
+    <a href="space.html">PLAY</a>
+  </div>
+
+</div>
 
 </body>
 </html>
