@@ -2,12 +2,46 @@
 <html>
 <head>
   <title>Clicker Game</title>
-</head>
-<body style="text-align:center; font-family:Arial;">
 
-  <h1>Clicker Game</h1>
+  <style>
+    body {
+      margin: 0;
+      text-align: center;
+      font-family: Arial;
+      background-color: #111;
+      color: white;
+      user-select: none;
+    }
+
+    #score {
+      font-size: 50px;
+      margin-top: 20px;
+    }
+
+    #bigButton {
+      font-size: 50px;
+      padding: 60px 100px;
+      border-radius: 25px;
+      border: none;
+      background-color: lime;
+      color: black;
+      cursor: pointer;
+      margin-top: 50px;
+    }
+
+    #bigButton:active {
+      transform: scale(0.95);
+      background-color: yellow;
+    }
+  </style>
+</head>
+
+<body onclick="addPoint()">
+
+  <h1>🔥 Tap Anywhere Clicker</h1>
   <p>Score: <span id="score">0</span></p>
-  <button onclick="addPoint()">Click Me!</button>
+
+  <button id="bigButton">CLICK ME</button>
 
   <script>
     let score = 0;
