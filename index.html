@@ -1,68 +1,89 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Nori's Game Hub</title>
+  <title>Nori's Arcade</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
-      background-color: #111;
-      color: white;
-      font-family: Arial;
-      text-align: center;
       margin: 0;
+      font-family: Arial;
+      background: radial-gradient(circle, #000 40%, #020024 100%);
+      color: white;
+      text-align: center;
     }
 
     h1 {
-      font-size: 8vw;
+      font-size: 9vw;
+      color: cyan;
+      text-shadow: 0 0 20px cyan, 0 0 40px cyan;
       margin-top: 20px;
     }
 
     p {
       font-size: 4vw;
+      color: #aaa;
     }
 
     .container {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
+      gap: 25px;
       padding: 20px;
     }
 
     .game {
-      background: #222;
-      padding: 20px;
+      background: #111;
+      border: 2px solid cyan;
       border-radius: 15px;
+      padding: 20px;
       width: 80%;
       max-width: 300px;
+      box-shadow: 0 0 15px cyan;
+      transition: 0.3s;
+    }
+
+    .game:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px cyan;
     }
 
     .game h3 {
       font-size: 6vw;
+      color: lime;
+      text-shadow: 0 0 10px lime;
     }
 
     a {
       display: inline-block;
-      margin-top: 10px;
+      margin-top: 15px;
       font-size: 5vw;
+      padding: 12px 25px;
+      border-radius: 10px;
+      border: none;
+      background: black;
       color: cyan;
       text-decoration: none;
-      padding: 10px 20px;
-      border: 2px solid cyan;
-      border-radius: 10px;
+      box-shadow: 0 0 10px cyan;
+      transition: 0.2s;
+    }
+
+    a:hover {
+      background: cyan;
+      color: black;
+      box-shadow: 0 0 20px cyan;
     }
 
     a:active {
-      background-color: cyan;
-      color: black;
+      transform: scale(0.95);
     }
 
-    /* Desktop layout */
+    /* Desktop tweaks */
     @media (min-width: 768px) {
       h1 {
-        font-size: 50px;
+        font-size: 60px;
       }
 
       p {
@@ -70,15 +91,11 @@
       }
 
       .game h3 {
-        font-size: 22px;
+        font-size: 24px;
       }
 
       a {
         font-size: 16px;
-      }
-
-      .game {
-        width: 250px;
       }
     }
   </style>
@@ -86,24 +103,24 @@
 
 <body>
 
-  <h1>🎮 Nori's Game Hub</h1>
-  <p>Play some cool games!</p>
+  <h1>🎮 Nori's Arcade</h1>
+  <p>Select a game and play!</p>
 
   <div class="container">
 
     <div class="game">
-      <h3>🔥 Clicker Game</h3>
-      <a href="clicker.html">Play</a>
+      <h3>🔥 Clicker</h3>
+      <a href="clicker.html">PLAY</a>
     </div>
 
     <div class="game">
-      <h3>🐍 Snake Game</h3>
-      <a href="snake.html">Play</a>
+      <h3>🐍 Snake</h3>
+      <a href="snake.html">PLAY</a>
     </div>
 
     <div class="game">
-      <h3>🏓 Pong (2 Player)</h3>
-      <a href="pong.html">Play</a>
+      <h3>🏓 Pong</h3>
+      <a href="pong.html">PLAY</a>
     </div>
 
   </div>
