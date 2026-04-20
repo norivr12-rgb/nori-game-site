@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Space Shooter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: white;
+      text-align: center;
+      font-family: Arial;
+      overflow: hidden;
+    }
+
+    canvas {
+      background: #000;
+      display: block;
+      margin: auto;
+      border: 2px solid cyan;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      font-size: 28px;
+      padding: 15px 20px;
+      border-radius: 12px;
+      border: none;
+      background: cyan;
+      color: black;
+      touch-action: manipulation;
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>🚀 Space Shooter</h2>
+<p>Score: <span id="score">0</span></p>
+
+<canvas id="game" width="300" height="500"></canvas>
+
+<div class="controls">
+  <button ontouchstart="left()" onclick="left()">⬅️</button>
+  <button ontouchstart="shoot()" onclick="shoot()">🔥</button>
+  <button ontouchstart="right()" onclick="right()">➡️</button>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let player = { x: 130, y: 450, w: 40, h: 40 };
+let bullets = [];
+let enemies = [];
+let score = 0;
+
+let leftHold = false;
+let rightHold = false;
+
+// keyboard controls
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft") left();
+  if (e.key === "ArrowRight") right();
+  if (e.key === " ") shoot();
+});
+
+function left() {
+  player.x -= 20;
+  if (player.x < 0) player.x = 0;
+}
+
+function right() {
+  player.x += 20;
+  if (player.x > 260) player.x = 260;
+}
+
+function shoot() {
+  bullets.push({ x: player.x + 18, y: player.y });
+}
+
+function spawnEnemy() {
+  enemies.push({
+    x: Math.random() * 260,
+    y: -20,
+    w: 30,
+    h: 30
+  });
+}
+
+function update() {
+  ctx.clearRect(0, 0, 300, 500);
+
+  // player
+  ctx.fillStyle = "lime";
+  ctx.fillRect(player.x, player.y, player.w, player.h);
+
+  // bullets
+  ctx.fillStyle = "yellow";
+  bullets.forEach(b => {
+    b.y -= 6;
+    ctx.fillRect(b.x, b.y, 5, 10);
+  });
+  bullets = bullets.filter(b => b.y > 0);
+
+  // enemies
+  ctx.fillStyle = "red";
+  enemies.forEach(e => {
+    e.y += 2;
+    ctx.fillRect(e.x, e.y, e.w, e.h);
+
+    // collision with player
+    if (
+      player.x < e.x + e.w &&
+      player.x + player.w > e.x &&
+      player.y < e.y + e.h &&
+      player.y + player.h > e.y
+    ) {
+      alert("💥 Game Over! Score: " + score);
+      location.reload();
+    }
+
+    // bullet hit
+    bullets.forEach((b, bi) => {
+      if (
+        b.x < e.x + e.w &&
+        b.x + 5 > e.x &&
+        b.y < e.y + e.h &&
+        b.y + 10 > e.y
+      ) {
+        enemies.splice(enemies.indexOf(e), 1);
+        bullets.splice(bi, 1);
+        score += 10;
+      }
+    });
+  });
+
+  enemies = enemies.filter(e => e.y < 500);
+
+  document.getElementById("score").innerText = score;
+}
+
+setInterval(update, 1000/60);
+setInterval(spawnEnemy, 800);
+</script>
+
+</body>
+</html>
