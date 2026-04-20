@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Wave Game</title>
+  <title>Wave Levels</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -17,17 +17,17 @@
     canvas {
       display: block;
       margin: auto;
-      background: #000;
       border: 2px solid cyan;
+      background: #000;
     }
   </style>
 </head>
 
 <body>
 
-<h2>⚡ Wave Game</h2>
-<p>Hold to go up | Release to go down</p>
-<p>Score: <span id="score">0</span></p>
+<h2>⚡ Wave Levels</h2>
+<p>Hold = up | Release = down</p>
+<p>Level: <span id="level">1</span> | Score: <span id="score">0</span></p>
 
 <canvas id="game" width="400" height="400"></canvas>
 
@@ -35,57 +35,86 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-let player = { x: 80, y: 200, size: 10 };
-let velocity = 0;
-let holding = false;
-
-let obstacles = [];
-let score = 0;
+let player, holding, velocity;
+let obstacles, spikes;
+let score, level;
+let levelLength;
 
 // controls
 document.addEventListener("keydown", e => {
   if (e.key === " ") holding = true;
 });
-
 document.addEventListener("keyup", e => {
   if (e.key === " ") holding = false;
 });
-
 canvas.addEventListener("touchstart", () => holding = true);
 canvas.addEventListener("touchend", () => holding = false);
 
-// spawn obstacles
-function spawnObstacle() {
-  let gap = 120;
-  let topHeight = Math.random() * 200;
+// START / RESET LEVEL
+function startLevel() {
+  player = { x: 80, y: 200, size: 10 };
+  velocity = 0;
+  holding = false;
 
-  obstacles.push({
-    x: 400,
-    top: topHeight,
-    bottom: topHeight + gap,
-    width: 40
-  });
+  obstacles = [];
+  spikes = [];
+
+  score = 0;
+  levelLength = 2000 + level * 500;
+
+  generateMap();
 }
 
-// game loop
+// RANDOM MAP GENERATION
+function generateMap() {
+  for (let x = 400; x < levelLength; x += 200) {
+
+    let gap = 100 - level * 2;
+    if (gap < 60) gap = 60;
+
+    let top = Math.random() * 200;
+
+    obstacles.push({
+      x: x,
+      top: top,
+      bottom: top + gap,
+      width: 40
+    });
+
+    // add spikes randomly
+    if (Math.random() < 0.6) {
+      spikes.push({
+        x: x + 80,
+        y: Math.random() * 350
+      });
+    }
+  }
+}
+
+// DRAW SPIKE
+function drawSpike(x, y) {
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + 10, y + 20);
+  ctx.lineTo(x - 10, y + 20);
+  ctx.closePath();
+  ctx.fill();
+}
+
+// GAME LOOP
 function update() {
   ctx.clearRect(0, 0, 400, 400);
 
-  // wave movement
-  if (holding) {
-    velocity = -4;
-  } else {
-    velocity = 4;
-  }
-
+  // movement
+  velocity = holding ? -4 : 4;
   player.y += velocity;
 
   // draw player
   ctx.fillStyle = "lime";
   ctx.beginPath();
   ctx.moveTo(player.x, player.y);
-  ctx.lineTo(player.x + player.size, player.y + player.size);
-  ctx.lineTo(player.x, player.y + player.size * 2);
+  ctx.lineTo(player.x + 10, player.y + 10);
+  ctx.lineTo(player.x, player.y + 20);
   ctx.closePath();
   ctx.fill();
 
@@ -94,37 +123,65 @@ function update() {
   obstacles.forEach(o => {
     o.x -= 4;
 
-    // top block
     ctx.fillRect(o.x, 0, o.width, o.top);
-
-    // bottom block
     ctx.fillRect(o.x, o.bottom, o.width, 400);
 
     // collision
     if (
       player.x < o.x + o.width &&
-      player.x + player.size > o.x &&
-      (player.y < o.top || player.y + player.size * 2 > o.bottom)
+      player.x + 10 > o.x &&
+      (player.y < o.top || player.y + 20 > o.bottom)
     ) {
-      alert("💥 Game Over! Score: " + score);
-      location.reload();
+      gameOver();
     }
   });
 
-  obstacles = obstacles.filter(o => o.x > -50);
+  // spikes
+  ctx.fillStyle = "orange";
+  spikes.forEach(s => {
+    s.x -= 4;
+    drawSpike(s.x, s.y);
+
+    if (
+      player.x < s.x + 10 &&
+      player.x + 10 > s.x &&
+      player.y < s.y + 20 &&
+      player.y + 20 > s.y
+    ) {
+      gameOver();
+    }
+  });
 
   // bounds
   if (player.y < 0 || player.y > 400) {
-    alert("💥 Game Over! Score: " + score);
-    location.reload();
+    gameOver();
   }
 
-  score++;
+  score += 2;
+
+  // LEVEL COMPLETE
+  if (score > levelLength) {
+    level++;
+    document.getElementById("level").innerText = level;
+    startLevel();
+  }
+
   document.getElementById("score").innerText = score;
 }
 
+// GAME OVER
+function gameOver() {
+  alert("💥 Game Over! Level: " + level);
+  level = 1;
+  document.getElementById("level").innerText = level;
+  startLevel();
+}
+
+// START GAME
+level = 1;
+startLevel();
+
 setInterval(update, 1000/60);
-setInterval(spawnObstacle, 1200);
 </script>
 
 </body>
