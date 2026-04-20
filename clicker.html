@@ -2,7 +2,6 @@
 <html>
 <head>
   <title>Clicker Game</title>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -16,16 +15,19 @@
 
     h1 {
       margin-top: 20px;
+      color: cyan;
+      text-shadow: 0 0 10px cyan;
     }
 
     #score {
-      font-size: 40px;
+      font-size: 50px;
       margin: 10px;
+      color: lime;
     }
 
     #clickBtn {
       font-size: 40px;
-      padding: 50px 80px;
+      padding: 50px 70px;
       border-radius: 20px;
       border: none;
       background: lime;
@@ -45,89 +47,97 @@
       margin-top: 20px;
     }
 
-    .item {
-      margin: 10px;
-    }
-
     button {
       font-size: 18px;
       padding: 10px;
+      margin-top: 10px;
       border-radius: 10px;
       border: none;
       background: cyan;
       color: black;
+    }
+
+    .item {
+      margin: 15px;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>🔥 Clicker Game</h1>
-  <div id="score">0</div>
+<h1>🔥 CLICKER GAME</h1>
 
-  <button id="clickBtn" onclick="click()">TAP</button>
+<div id="score">0</div>
 
-  <div class="shop">
-    <h2>🛒 Shop</h2>
+<button id="clickBtn" onclick="clicker()">TAP</button>
 
-    <div class="item">
-      <p>+1 per click (Cost: <span id="costClick">10</span>)</p>
-      <button onclick="buyClick()">Buy</button>
-    </div>
+<div class="shop">
+  <h2>🛒 SHOP</h2>
 
-    <div class="item">
-      <p>Auto Clicker (Cost: <span id="costAuto">25</span>)</p>
-      <button onclick="buyAuto()">Buy</button>
-    </div>
-
+  <div class="item">
+    <p>⚡ +1 Click Power (Cost: <span id="costPower">10</span>)</p>
+    <button onclick="buyPower()">BUY</button>
   </div>
 
-  <script>
-    let score = 0;
-    let clickPower = 1;
+  <div class="item">
+    <p>🤖 Auto Clicker (Cost: <span id="costAuto">25</span>)</p>
+    <button onclick="buyAuto()">BUY</button>
+  </div>
+</div>
 
-    let autoClickers = 0;
+<script>
 
-    let costClick = 10;
-    let costAuto = 25;
+// GAME STATE (IMPORTANT FIX)
+let score = 0;
+let clickPower = 1;
+let autoClickers = 0;
 
-    function update() {
-      document.getElementById("score").innerText = score;
-      document.getElementById("costClick").innerText = costClick;
-      document.getElementById("costAuto").innerText = costAuto;
-    }
+let costPower = 10;
+let costAuto = 25;
 
-    function click() {
-      score += clickPower;
-      update();
-    }
+// CLICK FUNCTION (FIXED)
+function clicker() {
+  score += clickPower;
+  update();
+}
 
-    function buyClick() {
-      if (score >= costClick) {
-        score -= costClick;
-        clickPower++;
-        costClick = Math.floor(costClick * 1.5);
-        update();
-      }
-    }
-
-    function buyAuto() {
-      if (score >= costAuto) {
-        score -= costAuto;
-        autoClickers++;
-        costAuto = Math.floor(costAuto * 1.7);
-        update();
-      }
-    }
-
-    // auto click loop
-    setInterval(() => {
-      score += autoClickers;
-      update();
-    }, 1000);
-
+// SHOP 1
+function buyPower() {
+  if (score >= costPower) {
+    score -= costPower;
+    clickPower += 1;
+    costPower = Math.floor(costPower * 1.5);
     update();
-  </script>
+  }
+}
+
+// SHOP 2
+function buyAuto() {
+  if (score >= costAuto) {
+    score -= costAuto;
+    autoClickers += 1;
+    costAuto = Math.floor(costAuto * 1.7);
+    update();
+  }
+}
+
+// AUTO CLICK SYSTEM
+setInterval(() => {
+  score += autoClickers;
+  update();
+}, 1000);
+
+// UPDATE UI (FIXED COUNTER)
+function update() {
+  document.getElementById("score").innerText = score;
+  document.getElementById("costPower").innerText = costPower;
+  document.getElementById("costAuto").innerText = costAuto;
+}
+
+// INITIAL LOAD
+update();
+
+</script>
 
 </body>
 </html>
