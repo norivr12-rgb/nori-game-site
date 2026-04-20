@@ -34,6 +34,7 @@
       color: black;
       margin: 20px auto;
       display: block;
+      touch-action: manipulation;
     }
 
     #clickBtn:active {
@@ -87,7 +88,6 @@
 
 <script>
 
-// GAME STATE (IMPORTANT FIX)
 let score = 0;
 let clickPower = 1;
 let autoClickers = 0;
@@ -95,47 +95,79 @@ let autoClickers = 0;
 let costPower = 10;
 let costAuto = 25;
 
-// CLICK FUNCTION (FIXED)
-function clicker() {
-  score += clickPower;
+/* 💾 LOAD SAVE */
+function loadGame() {
+  let save = localStorage.getItem("clickerSave");
+
+  if (save) {
+    let data = JSON.parse(save);
+
+    score = data.score || 0;
+    clickPower = data.clickPower || 1;
+    autoClickers = data.autoClickers || 0;
+    costPower = data.costPower || 10;
+    costAuto = data.costAuto || 25;
+  }
+
   update();
 }
 
-// SHOP 1
+/* 💾 SAVE GAME */
+function saveGame() {
+  localStorage.setItem("clickerSave", JSON.stringify({
+    score,
+    clickPower,
+    autoClickers,
+    costPower,
+    costAuto
+  }));
+}
+
+/* 🖱 CLICK */
+function clicker() {
+  score += clickPower;
+  update();
+  saveGame();
+}
+
+/* ⚡ BUY CLICK POWER */
 function buyPower() {
   if (score >= costPower) {
     score -= costPower;
     clickPower += 1;
     costPower = Math.floor(costPower * 1.5);
     update();
+    saveGame();
   }
 }
 
-// SHOP 2
+/* 🤖 BUY AUTO CLICKER */
 function buyAuto() {
   if (score >= costAuto) {
     score -= costAuto;
     autoClickers += 1;
     costAuto = Math.floor(costAuto * 1.7);
     update();
+    saveGame();
   }
 }
 
-// AUTO CLICK SYSTEM
+/* 🔁 AUTO CLICK SYSTEM */
 setInterval(() => {
   score += autoClickers;
   update();
+  saveGame();
 }, 1000);
 
-// UPDATE UI (FIXED COUNTER)
+/* 🔄 UPDATE UI */
 function update() {
   document.getElementById("score").innerText = score;
   document.getElementById("costPower").innerText = costPower;
   document.getElementById("costAuto").innerText = costAuto;
 }
 
-// INITIAL LOAD
-update();
+/* 🚀 START GAME */
+loadGame();
 
 </script>
 
